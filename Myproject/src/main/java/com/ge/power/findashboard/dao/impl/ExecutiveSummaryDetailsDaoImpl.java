@@ -1,6 +1,5 @@
 package com.ge.power.findashboard.dao.impl;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -14,10 +13,11 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
 import com.ge.power.findashboard.constants.FinAppConstants;
-import com.ge.power.findashboard.controller.FinanceAppSearchController;
 import com.ge.power.findashboard.dao.ExecutiveSummaryDetailsDAO;
 import com.ge.power.findashboard.dao.impl.commons.FindashBoardDateUtil;
 import com.ge.power.findashboard.entity.FindashAlert;
+import com.ge.power.findashboard.entity.FindashClosingFinancePlan;
+import com.ge.power.findashboard.entity.FindashClosingFinancialsAgg;
 import com.ge.power.findashboard.entity.FindashClosingOperationsAgg;
 import com.ge.power.findashboard.entity.FindashClosingSchedule;
 import com.ge.power.findashboard.entity.FindashMessage;
@@ -69,11 +69,12 @@ public class ExecutiveSummaryDetailsDaoImpl implements ExecutiveSummaryDetailsDA
 	}
 
 	@Override
-	public List<FinancialGraphVO> getFinancialGraphDetails(String kpsList,String quaterIndicator,String quater,String quaterEndDate) {
+	public List<FindashClosingFinancialsAgg> getFinancialGraphDetails(String kpsList,String quaterIndicator,String quater,	Long year) {
 		
 		List<FinancialGraphVO> graphDetails= null;
 		List<String> kpListstring= new ArrayList<String>();
 		EntityManager em = null;
+		List<FindashClosingFinancialsAgg> results=null;
 		try{
 			StringBuffer stf= new StringBuffer();
 			StringTokenizer stk = new StringTokenizer(kpsList,",");
@@ -85,19 +86,22 @@ public class ExecutiveSummaryDetailsDaoImpl implements ExecutiveSummaryDetailsDA
 			}
 			em = emf.createEntityManager();
 			Query q = em.createNamedQuery("@GETKPISDETAISL").setParameter("s",kpListstring);
-			q.setParameter("year",Long.valueOf(FindashBoardDateUtil.formatDate(quaterEndDate,FinAppConstants.YEAR)));
+			logger.info("Named Query::: @GETKPISDETAISL");
+			q.setParameter("year",year);
 			q.setParameter("quarter",quater);
-			logger.info("Paramers::: Kps:"+kpListstring+"year:::"+FindashBoardDateUtil.formatDate(quaterEndDate,FinAppConstants.YEAR)+"quarter"+quater);
-			List<Object> results = q.getResultList();
-			FinancialGraphVO vo = new FinancialGraphVO(results);
-			graphDetails = vo.getFinanciGraphVoList();			
+			logger.info("Paramers::: Kps:"+kpListstring+"year:::"+year+"quarter"+quater);
+			results = q.getResultList();
+			/*FinancialGraphVO vo = new FinancialGraphVO(results);
+			graphDetails = vo.getFinanciGraphVoList();		*/	
 			
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
 			em.close();
 		}
-		return graphDetails;
+		
+		//return graphDetails;
+		return results;
 	}
 
 	@Override
@@ -209,6 +213,37 @@ public class ExecutiveSummaryDetailsDaoImpl implements ExecutiveSummaryDetailsDA
 						em.close();
 					}
 					return results;
+	}
+
+	/**
+	 * @param quater
+	 * @param quaterEndDate
+	 * @return
+	 * @throws Exception
+	 */
+	@Override
+	public List<FindashClosingFinancePlan> getFinacialGraphGoalDetails(String quater, Long year)
+		throws Exception {
+		logger.info("In getFinanciaGrpahGoalDetails--->Start");
+		List<FindashClosingFinancePlan> goalDetails = null;
+		EntityManager em = null;
+		try{
+			
+			em = emf.createEntityManager();
+			Query query= em.createNamedQuery("@GETGOALDETAILSDAILY");
+			logger.info("Named Query Created:::@GETGOALDETAILSDAILY");
+			query.setParameter("grainind",FinAppConstants.DAY_INDICATOR);
+			query.setParameter("quarter", quater);
+			query.setParameter("year", year);
+			logger.info("PARAMETERS FOR QUERY:::GRAININD:"+FinAppConstants.DAY_INDICATOR+"quarter:"+quater+"year::"+year);
+			goalDetails = query.getResultList();		
+			logger.info("Query Execution Completed:::");
+		}catch(Exception e){
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+		logger.info("In getFinanciaGrpahGoalDetails--->End");
+		return goalDetails;
 	}
 	
 }

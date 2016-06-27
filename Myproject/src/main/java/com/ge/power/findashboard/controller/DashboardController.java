@@ -3,25 +3,29 @@ package com.ge.power.findashboard.controller;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Map;
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ge.power.findashboard.dao.ExecutiveSummaryDetailsDAO;
 import com.ge.power.findashboard.entity.FindashAlert;
+import com.ge.power.findashboard.entity.FindashClosingFinancialsAgg;
 import com.ge.power.findashboard.entity.FindashClosingOperationsAgg;
 import com.ge.power.findashboard.entity.FindashClosingSchedule;
 import com.ge.power.findashboard.entity.FindashMessage;
 import com.ge.power.findashboard.entity.FindashProcessingRate;
-import com.ge.power.findashboard.service.DashboardService;
+//import com.ge.power.findashboard.service.DashboardService;
+import com.ge.power.findashboard.service.ExecutiveSummaryService;
 import com.ge.power.findashboard.vo.FinacialQuaterVO;
 import com.ge.power.findashboard.vo.FinancialGraphVO;
 import com.ge.power.findashboard.vo.FinancialKpiVO;
@@ -32,17 +36,20 @@ import com.ge.power.findashboard.vo.UserVO;
 @RestController
 @RequestMapping("/services")
 public class DashboardController {
-	@Autowired 
+	/*@Autowired 
 	private DashboardService dashboardService;
-	
+	*/
 	@Autowired
 	private ExecutiveSummaryDetailsDAO executiveSummaryDao;
+	
+	@Autowired
+	ExecutiveSummaryService executiveSummaryService;
 	
 	
 	@RequestMapping(value="/get/userDetails", method = RequestMethod.GET, produces =  "application/json")
 	public @ResponseBody String userDetails() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException{
 		System.out.println(" in Type MasterService Manager userDetails Method...");
-		List<UserVO> userDetails= dashboardService.userDetails();
+	//	List<UserVO> userDetails= dashboardService.userDetails();
 		System.out.println("returning the response-----> userDetails MasterData");
 		return "Satyan";
 	}	
@@ -66,13 +73,16 @@ public class DashboardController {
 		return quatersList;		
 	}
 	
+	
 	@RequestMapping(value="/executiveSummary/getFinancialChartValues")
-	@GET
+	@POST
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<FinancialGraphVO> getFinancialGraphDetails(@RequestParam("kpi") String kpsList,@RequestParam("qind") String quaterIndicator,@RequestParam("quarter") String quater,@RequestParam("qEndDate") String qEndDate) throws Exception{		
-		List<FinancialGraphVO> graphDetails = null;
-		graphDetails = executiveSummaryDao.getFinancialGraphDetails(kpsList,quaterIndicator,quater,qEndDate);
-		return graphDetails;
+	//@JsonView(View.Public.class)
+	public Map<String,FinancialGraphVO> getFinancialGraphDetails(@FormParam("kpi") String kpi,@FormParam("qind") String qind,@FormParam("quarter") String quarter,@FormParam("qEndDate") String qEndDate) throws Exception{
+		List<FindashClosingFinancialsAgg> graphDetails = null;
+		Map<String,FinancialGraphVO> finGraphDetails = null;
+		finGraphDetails = executiveSummaryService.getFinancialGraphDetails(kpi, qind, quarter, qEndDate);
+		return finGraphDetails;
 		
 	}
 	

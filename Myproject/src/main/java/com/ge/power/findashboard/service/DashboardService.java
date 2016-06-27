@@ -1,4 +1,4 @@
-package com.ge.power.findashboard.service;
+/*package com.ge.power.findashboard.service;
 
 import java.util.List;
 
@@ -13,10 +13,13 @@ public class DashboardService {
 
 	@Autowired 
 	private DashboardDAO dashboardDAO;
+	
+	@Autowired
+	private ExecutiveServiceImpl
 
-	public List<UserVO> userDetails() {
-		// TODO Auto-generated method stub
-		return dashboardDAO.userDetails();
-	}
+	
+	
+	
 
 }
+*/

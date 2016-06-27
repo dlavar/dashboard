@@ -6,5 +6,6 @@ public interface FinAppConstants {
 	String CURRENT_QUARTER_INDICATOR="C";
 	String PREVIOUS_QUARTER_INDICATOR="P";
 	Integer MAX_QUARTERSLIST=4;
+	String DAY_INDICATOR = "D";
 	
 }

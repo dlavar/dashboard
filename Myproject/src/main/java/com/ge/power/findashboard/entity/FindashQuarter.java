@@ -29,7 +29,7 @@ public class FindashQuarter implements Serializable {
 
 	@Id
 	private String quarter;
-	@Id
+	
 	@Column(name="R_YEAR")
 	private BigDecimal rYear;
 
